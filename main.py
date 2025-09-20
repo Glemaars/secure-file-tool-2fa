@@ -1,6 +1,10 @@
+import os
 from src.auth import setup_2fa, verify_2fa
 from src.encryption import generate_key, save_key, load_key, encrypt_file, decrypt_file
-import os
+
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DATA_FOLDER = os.path.join(PROJECT_ROOT, "data")
+KEY_FILE = os.path.join(DATA_FOLDER, "key.key")
 
 def main():
     totp = setup_2fa()
@@ -8,14 +12,15 @@ def main():
         print("Exiting program...")
         return
 
-    print("You can now encrypt/decrypt files!")
-    key_file = "data/key.key"
-    if not os.path.exists(key_file):
+    print("Access granted. You can now encrypt/decrypt files!")
+
+    os.makedirs(DATA_FOLDER, exist_ok=True)
+
+    if not os.path.exists(KEY_FILE):
         key = generate_key()
-        os.makedirs("data", exist_ok=True)
-        save_key(key, key_file)
+        save_key(key, KEY_FILE)
     else:
-        key = load_key(key_file)
+        key = load_key(KEY_FILE)
 
     while True:
         action = input("Choose action: [E]ncrypt, [D]ecrypt, [Q]uit: ").lower()
